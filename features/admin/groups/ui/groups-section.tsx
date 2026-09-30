@@ -4,14 +4,20 @@ import { useState } from "react";
 
 import { PrimaryButton } from "@/components/admin-table/primary-button";
 import { SearchInput } from "@/components/admin-table/search-input";
+import { useAdminData } from "@/providers/admin-data-provider";
 
-import { mockGroups } from "../api/mock-groups";
 import { CreateGroupModal } from "../components/create-group-modal";
 import { GroupsTable } from "../components/groups-table";
 
 export function GroupsSection() {
+  const { groups } = useAdminData();
   const [query, setQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+
+  const search = query.trim().toLowerCase();
+  const rows = groups.filter((group) =>
+    group.name.toLowerCase().includes(search),
+  );
 
   return (
     <main className="min-h-screen pt-32.5 pb-3.5">
@@ -27,11 +33,7 @@ export function GroupsSection() {
           </PrimaryButton>
         </div>
 
-        <GroupsTable
-          rows={mockGroups.filter((group) =>
-            group.name.toLowerCase().includes(query.trim().toLowerCase()),
-          )}
-        />
+        <GroupsTable rows={rows} />
       </section>
 
       <CreateGroupModal open={createOpen} onOpenChange={setCreateOpen} />

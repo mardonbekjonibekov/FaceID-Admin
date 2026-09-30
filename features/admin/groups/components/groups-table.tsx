@@ -31,6 +31,7 @@ export function GroupsTable({ rows }: { rows: Group[] }) {
       columns={columns}
       rows={pagination.visibleRows}
       indexOffset={pagination.offset}
+      emptyText="Ma’lumot topilmadi"
       getRowKey={(row) => row.id}
       headHeight={50}
       headTop="17px"

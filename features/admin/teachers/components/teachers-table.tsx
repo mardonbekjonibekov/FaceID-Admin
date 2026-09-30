@@ -17,7 +17,12 @@ const columns: AdminColumn<Teacher>[] = [
   { key: "direction", label: "Yo’nalish", left: 418, headLeft: 419, top: "17px", cell: (row) => row.direction },
 ];
 
-export function TeachersTable({ rows }: { rows: Teacher[] }) {
+interface TeachersTableProps {
+  rows: Teacher[];
+  onDelete: (teacher: Teacher) => void;
+}
+
+export function TeachersTable({ rows, onDelete }: TeachersTableProps) {
   const pagination = usePagination(rows);
 
   return (
@@ -31,10 +36,12 @@ export function TeachersTable({ rows }: { rows: Teacher[] }) {
       textClassName="text-[16px]"
       className="absolute top-19.5 left-3.75 w-342.75 rounded-card"
       style={{ height: "calc(100% - 93px)" }}
-      rowActions={() => (
+      emptyText="Ma’lumot topilmadi"
+      rowActions={(row) => (
         <button
           type="button"
-          aria-label="O’chirish"
+          aria-label={`${row.fullName}ni o’chirish`}
+          onClick={() => onDelete(row)}
           className="absolute top-3.75 right-3.75 size-6"
         >
           <Icon name="trash" size={24} className="text-danger" />

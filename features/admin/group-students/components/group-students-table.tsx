@@ -66,9 +66,10 @@ const columns: AdminColumn<GroupStudent>[] = [
 
 interface GroupStudentsTableProps {
   rows: GroupStudent[];
+  onDelete: (student: GroupStudent) => void;
 }
 
-export function GroupStudentsTable({ rows }: GroupStudentsTableProps) {
+export function GroupStudentsTable({ rows, onDelete }: GroupStudentsTableProps) {
   const pagination = usePagination(rows);
 
   return (
@@ -82,10 +83,12 @@ export function GroupStudentsTable({ rows }: GroupStudentsTableProps) {
       textClassName="text-[14px]"
       className="absolute top-19.5 left-3.75 w-342.5 rounded-card"
       style={{ height: "calc(100% - 93px)" }}
-      rowActions={() => (
+      emptyText="Ma’lumot topilmadi"
+      rowActions={(row) => (
         <button
           type="button"
-          aria-label="O’chirish"
+          aria-label={`${row.fullName}ni o’chirish`}
+          onClick={() => onDelete(row)}
           className="absolute top-3.75 right-4.75 size-6"
         >
           <Icon name="trash" size={24} className="text-danger" />

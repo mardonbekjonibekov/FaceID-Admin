@@ -30,6 +30,8 @@ interface AdminTableProps<T> {
   footerStyle?: CSSProperties;
   /** number of rows on previous pages, so `#` keeps counting across pages */
   indexOffset?: number;
+  /** shown in the body when there are no rows */
+  emptyText?: string;
 }
 
 /**
@@ -50,6 +52,7 @@ export function AdminTable<T>({
   footer,
   footerStyle,
   indexOffset = 0,
+  emptyText,
 }: AdminTableProps<T>) {
   return (
     <div
@@ -114,6 +117,15 @@ export function AdminTable<T>({
         ))}
         </div>
       </div>
+
+      {rows.length === 0 && emptyText ? (
+        <p
+          className="absolute inset-x-0 flex items-center justify-center text-[17px] text-ink-muted"
+          style={{ top: headHeight, bottom: footer ? 66 : 0 }}
+        >
+          {emptyText}
+        </p>
+      ) : null}
 
       {footer ? (
         <div className="absolute" style={footerStyle}>

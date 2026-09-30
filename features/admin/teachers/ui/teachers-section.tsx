@@ -1,17 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { PrimaryButton } from "@/components/admin-table/primary-button";
 import { SearchInput } from "@/components/admin-table/search-input";
+import { ConfirmDeleteModal } from "@/components/modal/confirm-delete-modal";
+import { useAdminData } from "@/providers/admin-data-provider";
 
-import { mockTeachers } from "../api/mock-teachers";
 import { CreateTeacherModal } from "../components/create-teacher-modal";
 import { TeachersTable } from "../components/teachers-table";
+import type { Teacher } from "../types/teacher";
 
 export function TeachersSection() {
+  const { teachers, deleteTeacher } = useAdminData();
   const [query, setQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<Teacher | null>(null);
+
+  const search = query.trim().toLowerCase();
+  const rows = teachers.filter((teacher) =>
+    teacher.fullName.toLowerCase().includes(search),
+  );
+
+  const confirmDelete = () => {
+    if (!toDelete) return;
+    deleteTeacher(toDelete.id);
+    toast.success(`${toDelete.fullName} o’chirildi`);
+    setToDelete(null);
+  };
 
   return (
     <main className="min-h-screen pt-32.25 pb-8.5">
@@ -27,14 +44,16 @@ export function TeachersSection() {
           </PrimaryButton>
         </div>
 
-        <TeachersTable
-          rows={mockTeachers.filter((teacher) =>
-            teacher.fullName.toLowerCase().includes(query.trim().toLowerCase()),
-          )}
-        />
+        <TeachersTable rows={rows} onDelete={setToDelete} />
       </section>
 
       <CreateTeacherModal open={createOpen} onOpenChange={setCreateOpen} />
+      <ConfirmDeleteModal
+        open={toDelete !== null}
+        onOpenChange={(open) => !open && setToDelete(null)}
+        itemName={toDelete?.fullName ?? ""}
+        onConfirm={confirmDelete}
+      />
     </main>
   );
 }

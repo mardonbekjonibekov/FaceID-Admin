@@ -14,8 +14,12 @@ const names = [
 ];
 
 // Mock data taken from the Figma frame; replace with a real API call.
-export const mockTeachers: Teacher[] = Array.from({ length: 100 }, (_, i) => ({
-  id: i + 1,
-  fullName: names[i % names.length],
-  direction: "Matematika",
-}));
+export const mockTeachers: Teacher[] = [
+  ...Array.from({ length: 100 }, (_, i) => ({
+    id: i + 1,
+    fullName: names[i % names.length],
+    direction: "Matematika",
+  })),
+  // teacher used by the mock groups
+  { id: 101, fullName: "Xasan Jumayev", direction: "Matematika" },
+];

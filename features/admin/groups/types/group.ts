@@ -5,4 +5,5 @@ export interface Group {
   lessonTime: string;
   faceIdOperator: string;
   direction: string;
+  teacher: string;
 }

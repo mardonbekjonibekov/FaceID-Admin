@@ -23,9 +23,12 @@ export function StudentSearchForm({ onSearch }: StudentSearchFormProps) {
         </span>
         <input
           value={value}
-          onChange={(event) =>
-            setValue(event.target.value.replace(/\D/g, "").slice(0, 14))
-          }
+          onChange={(event) => {
+            // results narrow down live while the JSHSHR is typed
+            const next = event.target.value.replace(/\D/g, "").slice(0, 14);
+            setValue(next);
+            onSearch(next);
+          }}
           inputMode="numeric"
           maxLength={14}
           placeholder="Masalan: 12345678910111"

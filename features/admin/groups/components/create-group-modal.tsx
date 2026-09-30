@@ -1,19 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { AdminModal } from "@/components/modal/admin-modal";
 import {
   ModalSelectField,
   ModalTextField,
 } from "@/components/modal/modal-fields";
+import { useAdminData } from "@/providers/admin-data-provider";
 import {
   DIRECTIONS,
   FACE_ID_OPERATORS,
   LESSON_DAYS,
   LESSON_TIMES,
-  TEACHERS,
 } from "@/shared/config/options";
+
+import {
+  groupSchema,
+  type GroupFormValues,
+} from "../schema/group-schema";
+
+const emptyValues: GroupFormValues = {
+  name: "",
+  lessonDays: "",
+  lessonTime: "",
+  faceIdOperator: "",
+  direction: "",
+  teacher: "",
+};
 
 interface CreateGroupModalProps {
   open: boolean;
@@ -21,32 +37,79 @@ interface CreateGroupModalProps {
 }
 
 export function CreateGroupModal({ open, onOpenChange }: CreateGroupModalProps) {
-  const [name, setName] = useState("");
-  const [days, setDays] = useState("");
-  const [time, setTime] = useState("");
-  const [faceId, setFaceId] = useState("");
-  const [direction, setDirection] = useState("");
-  const [teacher, setTeacher] = useState("");
+  const { teachers, addGroup } = useAdminData();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<GroupFormValues>({
+    resolver: zodResolver(groupSchema),
+    defaultValues: emptyValues,
+  });
+
+  const teacherNames = [...new Set(teachers.map((teacher) => teacher.fullName))];
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) reset(emptyValues);
+    onOpenChange(next);
+  };
+
+  const onSubmit = handleSubmit((values) => {
+    addGroup({ ...values, name: values.name.trim() });
+    toast.success(`“${values.name.trim()}” guruhi yaratildi`);
+    handleOpenChange(false);
+  });
 
   return (
     <AdminModal
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       title="Guruh yaratish"
       top={149}
-      onSubmit={() => onOpenChange(false)}
+      onSubmit={onSubmit}
     >
       <ModalTextField
         label="Guruh nomi"
         placeholder="Guruh nomini kiriting"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
+        error={errors.name?.message}
+        {...register("name")}
       />
-      <ModalSelectField label="Dars kunlari" placeholder="-Dars kunlarini tanlang-" options={LESSON_DAYS} value={days} onChange={setDays} />
-      <ModalSelectField label="Dars vaqtlari" placeholder="-Dars vaqtini tanlang-" options={LESSON_TIMES} value={time} onChange={setTime} />
-      <ModalSelectField label="Face ID chi" placeholder="-FaceID’chini tanlang-" options={FACE_ID_OPERATORS} value={faceId} onChange={setFaceId} />
-      <ModalSelectField label="Yo’nalish" placeholder="-Yo’nalishni tanlang-" options={DIRECTIONS} value={direction} onChange={setDirection} />
-      <ModalSelectField label="O’qituvchi" placeholder="-O’qituvchini tanlang-" options={TEACHERS} value={teacher} onChange={setTeacher} />
+      <ModalSelectField
+        label="Dars kunlari"
+        placeholder="-Dars kunlarini tanlang-"
+        options={LESSON_DAYS}
+        error={errors.lessonDays?.message}
+        {...register("lessonDays")}
+      />
+      <ModalSelectField
+        label="Dars vaqtlari"
+        placeholder="-Dars vaqtini tanlang-"
+        options={LESSON_TIMES}
+        error={errors.lessonTime?.message}
+        {...register("lessonTime")}
+      />
+      <ModalSelectField
+        label="Face ID chi"
+        placeholder="-FaceID’chini tanlang-"
+        options={FACE_ID_OPERATORS}
+        error={errors.faceIdOperator?.message}
+        {...register("faceIdOperator")}
+      />
+      <ModalSelectField
+        label="Yo’nalish"
+        placeholder="-Yo’nalishni tanlang-"
+        options={DIRECTIONS}
+        error={errors.direction?.message}
+        {...register("direction")}
+      />
+      <ModalSelectField
+        label="O’qituvchi"
+        placeholder="-O’qituvchini tanlang-"
+        options={teacherNames}
+        error={errors.teacher?.message}
+        {...register("teacher")}
+      />
     </AdminModal>
   );
 }
